@@ -169,6 +169,13 @@ class TelaTermo{
         });
     }
 
+    DesbilitarTodosBotoes() {
+        this.buttons.forEach(btn => {
+            btn.style.backgroundColor = "rgb(54, 70, 99)";
+            btn.disabled = true;
+        });
+    }
+
     PintarDivs(cores:string[], painelAtual:HTMLDivElement):void 
     {
         let i:number = 0;
