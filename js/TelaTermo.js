@@ -96,9 +96,11 @@ class TelaTermo {
     VerificaResultado(resultado) {
         if (resultado == true) {
             const notificacaoVitoria = document.createElement('h3');
-            notificacaoVitoria.textContent = this.jogo.palavraSecreta + ' Foram as Letras Usadas, Voce Acertou com ' + this.jogo.ObterQuantidadeDeErros() + ' tentativas!';
+            notificacaoVitoria.textContent = 'Vitoria! Voce Acertou com ' + this.jogo.ObterQuantidadeDeErros() + ' tentativas!';
             this.notificacao.appendChild(notificacaoVitoria);
             this.notificacao.style.color = "green";
+            this.notificacao.style.border = "2px solid green";
+            this.notificacao.style.borderRadius = "10px";
         }
         if (resultado == false) {
             if (this.jogo.ObterQuantidadeDeErros() == 5) {
@@ -106,6 +108,8 @@ class TelaTermo {
                 notificacaoDerrota.textContent = 'Voce Perdeu, Tente Novamente! A Palavra era ' + this.jogo.palavraSecreta;
                 this.notificacao.appendChild(notificacaoDerrota);
                 this.notificacao.style.color = "Red";
+                this.notificacao.style.border = "2px solid red";
+                this.notificacao.style.borderRadius = "10px";
             }
         }
     }
@@ -121,6 +125,12 @@ class TelaTermo {
                 btn.style.backgroundColor = "rgb(54, 70, 99)";
                 btn.disabled = true;
             }
+        });
+    }
+    DesbilitarTodosBotoes() {
+        this.buttons.forEach(btn => {
+            btn.style.backgroundColor = "rgb(54, 70, 99)";
+            btn.disabled = true;
         });
     }
     PintarDivs(cores, painelAtual) {
