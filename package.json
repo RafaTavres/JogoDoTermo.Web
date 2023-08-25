@@ -1,0 +1,17 @@
+{
+  "name": "jogodotermo.web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cp -r src/assets dist && tsc -w",
+    "build": "cp -r src/assets dist && tsc -w",
+    "publish": "git subtree push --prefix dist origin gh-pages"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.1.6"
+  }
+}
