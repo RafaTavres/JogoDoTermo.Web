@@ -81,9 +81,10 @@ export class Termo {
             "igual", "ileso", "imune", "irado", "isola", "jarra", "jaula", "jegue", "jeito", "jogar",
             "jovem", "juíza", "juizo", "julho", "junho", "jurar", "justa"
         ];
-        let indice = this.GerarNumeroAleatorio();
+        let indice = this.GerarNumeroAleatorio(palavras.length);
         let palavraSecreta = palavras[indice];
-        return palavraSecreta;
+        let palavraNormalizada = palavraSecreta.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return palavraNormalizada;
     }
     RetornarLetrasErradas(palavraChutada) {
         let letras = '';
@@ -117,10 +118,9 @@ export class Termo {
         }
         return letras;
     }
-    JogadorAcertou() {
-    }
-    GerarNumeroAleatorio() {
-        return Math.floor((Math.random() * 30) + 1);
+    GerarNumeroAleatorio(tamanho) {
+        return Math.floor((Math.random() * tamanho) + 1);
+        ;
     }
 }
 //# sourceMappingURL=Termo.js.map

@@ -102,9 +102,10 @@ export class Termo{
             "jovem", "juíza", "juizo", "julho", "junho", "jurar", "justa"
         ];
 
-        let indice:number = this.GerarNumeroAleatorio();
-        let palavraSecreta:string = palavras[indice];  
-        return palavraSecreta;
+        let indice:number = this.GerarNumeroAleatorio(palavras.length);
+        let palavraSecreta:string = palavras[indice];
+        let palavraNormalizada:string = palavraSecreta.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return palavraNormalizada;
     }
 
 
@@ -151,15 +152,10 @@ export class Termo{
         return letras;
     }
 
-    JogadorAcertou()
-    {
-           
-    }
 
-
-    GerarNumeroAleatorio():number
+    GerarNumeroAleatorio(tamanho:number):number
     {
-        return Math.floor((Math.random() * 30) + 1);
+        return Math.floor((Math.random() * tamanho) + 1);;
     }
 
 
