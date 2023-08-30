@@ -1,47 +1,80 @@
-export class Termo {
-    constructor() {
+import { historicoUsuario } from "./historico-usuario";
+
+
+export class Termo{
+    
+    
+   
+    Erros: number;
+    palavraSecreta: string;
+    coresDoFedback:string[];
+    private _historico: historicoUsuario;
+
+    get historico(): historicoUsuario{
+        return this._historico;
+    }
+
+    set historico(novo: historicoUsuario){
+         this._historico = novo;
+    }
+
+    constructor(historico: historicoUsuario) {
         this.Erros = 0;
         this.coresDoFedback = new Array();
         this.palavraSecreta = this.ObterPalavraSecreta();
         console.log(this.palavraSecreta);
+        this.historico = historico;
     }
-    ObterQuantidadeDeErros() {
+
+
+
+    ObterQuantidadeDeErros():number{
         return this.Erros;
     }
-    VerificaChute(palavraChutada) {
+
+    VerificaChute(palavraChutada: string): boolean {
         this.coresDoFedback = [];
-        if (palavraChutada == this.palavraSecreta) {
+        if(palavraChutada == this.palavraSecreta){
             for (let index = 0; index < 5; index++) {
                 this.coresDoFedback.push("rgb(68, 212, 6)");
-            }
+            }           
             return true;
         }
-        else {
-            for (let index = 0; index < this.palavraSecreta.length; index++) {
-                let letraChutadaAtual = palavraChutada.charAt(index);
-                let letraSecretaAtual = this.palavraSecreta.charAt(index);
-                if (letraSecretaAtual == letraChutadaAtual) {
+        else{
+          
+            for (let index = 0; index < this.palavraSecreta.length; index++) 
+            {
+                let letraChutadaAtual:string =  palavraChutada.charAt(index);
+                let letraSecretaAtual:string =  this.palavraSecreta.charAt(index);
+                if(letraSecretaAtual == letraChutadaAtual)
+                {
                     //Adiciona RGB verde a lista
                     this.coresDoFedback.push("rgb(68, 212, 6)");
-                }
-                else if (this.palavraSecreta.includes(letraChutadaAtual)) {
+                }else
+                if(this.palavraSecreta.includes(letraChutadaAtual))
+                {
                     //Adiciona RGB amarelo a lista
                     this.coresDoFedback.push("rgb(212, 164, 6)");
-                }
-                else {
+
+                }else
+                {
                     //Adiciona RGB cinza a lista
                     this.coresDoFedback.push("rgb(54, 70, 99)");
                 }
             }
             this.Erros++;
-            return false;
+            return false;  
         }
     }
-    ObterCoresDeFedBack() {
+
+    ObterCoresDeFedBack():string[]{
         return this.coresDoFedback;
     }
-    ObterPalavraSecreta() {
-        let palavras = [
+
+    ObterPalavraSecreta(): string
+    {
+        let palavras: string[] = 
+        [
             "ácido", "adiar", "ímpar", "algar", "amado", "amigo", "anexo", "anuir", "aonde", "apelo",
             "aquém", "argil", "arroz", "assar", "atrás", "ávido", "azeri", "babar", "bagre", "banho",
             "barco", "bicho", "bolor", "brasa", "brava", "brisa", "bruto", "bulir", "caixa", "cansa",
@@ -81,46 +114,76 @@ export class Termo {
             "igual", "ileso", "imune", "irado", "isola", "jarra", "jaula", "jegue", "jeito", "jogar",
             "jovem", "juíza", "juizo", "julho", "junho", "jurar", "justa"
         ];
-        let indice = this.GerarNumeroAleatorio(palavras.length);
-        let palavraSecreta = palavras[indice];
-        let palavraNormalizada = palavraSecreta.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        let indice:number = this.GerarNumeroAleatorio(palavras.length);
+        let palavraSecreta:string = palavras[indice];
+        let palavraNormalizada:string = palavraSecreta.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         return palavraNormalizada;
     }
-    RetornarLetrasErradas(palavraChutada) {
+
+
+    RetornarLetrasErradas(palavraChutada: string): string {
         let letras = '';
-        for (let index = 0; index < this.palavraSecreta.length; index++) {
-            let letraChutadaAtual = palavraChutada.charAt(index);
-            if (!this.palavraSecreta.includes(letraChutadaAtual)) {
+        for (let index = 0; index < this.palavraSecreta.length; index++) 
+        {
+            let letraChutadaAtual:string =  palavraChutada.charAt(index);
+            if(!this.palavraSecreta.includes(letraChutadaAtual))
+             {
                 letras += letraChutadaAtual;
-            }
+             }  
         }
         return letras;
     }
-    RetornarLetrasCertas(palavraChutada) {
+
+
+    RetornarLetrasCertas(palavraChutada: string): string {
         let letras = '';
-        for (let index = 0; index < this.palavraSecreta.length; index++) {
-            let letraChutadaAtual = palavraChutada.charAt(index);
-            let letraSecretaAtual = this.palavraSecreta.charAt(index);
-            if (letraSecretaAtual == letraChutadaAtual) {
-                letras += this.palavraSecreta.charAt(index);
-            }
+        for (let index = 0; index < this.palavraSecreta.length; index++) 
+        {
+            let letraChutadaAtual:string =  palavraChutada.charAt(index);
+            let letraSecretaAtual:string =  this.palavraSecreta.charAt(index);
+            if(letraSecretaAtual == letraChutadaAtual)
+            {
+                letras+=this.palavraSecreta.charAt(index);
+            }  
         }
         return letras;
     }
-    RetornarLetrasExistentes(palavraChutada) {
+
+
+    RetornarLetrasExistentes(palavraChutada: string): string {
         let letras = '';
-        for (let index = 0; index < this.palavraSecreta.length; index++) {
-            let letraChutadaAtual = palavraChutada.charAt(index);
-            let letraSecretaAtual = this.palavraSecreta.charAt(index);
-            if (this.palavraSecreta.includes(letraChutadaAtual) && letraSecretaAtual != letraChutadaAtual) {
+        for (let index = 0; index < this.palavraSecreta.length; index++) 
+        {
+            let letraChutadaAtual:string =  palavraChutada.charAt(index);
+            let letraSecretaAtual:string =  this.palavraSecreta.charAt(index);
+             if(this.palavraSecreta.includes(letraChutadaAtual) && letraSecretaAtual != letraChutadaAtual)
+             {
                 letras += letraChutadaAtual;
-            }
+             }  
         }
         return letras;
     }
-    GerarNumeroAleatorio(tamanho) {
-        return Math.floor((Math.random() * tamanho) + 1);
-        ;
+
+
+    GerarNumeroAleatorio(tamanho:number):number
+    {
+        return Math.floor((Math.random() * tamanho) + 1);;
     }
+
+    registrarVitoria(){
+        this.historico.jogos++;
+        this.historico.vitorias++;
+        this.historico.sequencia++;
+
+        this.historico.tentativas[this.Erros - 1]++;
+    }
+    registrarDerrota(){
+        this.historico.jogos++;
+        this.historico.derrotas++;
+        this.historico.sequencia = 0;
+
+        this.historico.tentativas[this.Erros - 1]++;
+    }
+
 }
-//# sourceMappingURL=Termo.js.map

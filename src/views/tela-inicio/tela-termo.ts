@@ -1,36 +1,44 @@
-import { isBreakOrContinueStatement, isDefaultClause } from "../node_modules/typescript/lib/typescript.js";
-import { Termo } from "./Termo.js";
+import { LocalStorageService } from "../../services/local-storage.service";
+import { Termo } from "../dominio/Termo";
+import './tela-termo.css';
+
 
 class TelaTermo{
     buttons:NodeListOf<HTMLButtonElement>;
 
     pnlConteudo: HTMLDivElement;
     pnlTermo: HTMLDivElement;
+    pnlHistorico: HTMLDivElement;
     pnlTeclado: HTMLDivElement;
     notificacao: HTMLDivElement;
 
+    btnExibirHistorico: HTMLButtonElement;
     btnDeletar:HTMLButtonElement;
     btnChutar:HTMLButtonElement;
     btnJogarNovamente:HTMLButtonElement;
 
     jogo:Termo;
     palavraChutada:string;
+    private localStorageService: LocalStorageService;
 
     chars: string[];
     constructor() {
-        this.palavraChutada = '';        this.buttons = document.querySelectorAll('.btn') as NodeListOf<HTMLButtonElement>;
+        this.palavraChutada = '';      
+        this.buttons = document.querySelectorAll('.btn') as NodeListOf<HTMLButtonElement>;
         this.notificacao = document.getElementById('divNotificacao') as HTMLDivElement;
 
+        this.pnlHistorico = document.getElementById('pnlHistorico') as HTMLDivElement;
         this.pnlConteudo = document.getElementById('pnlConteudo') as HTMLDivElement;
         this.pnlTermo = document.getElementById('pnlTermo') as HTMLDivElement;
         this.pnlTeclado = document.getElementById('pnlTeclado') as HTMLDivElement;
 
+        this.btnExibirHistorico = document.getElementById('btnExibirHistorico') as HTMLButtonElement;
         this.btnChutar = document.getElementById('btnChutar') as HTMLButtonElement;
         this.btnDeletar = document.getElementById('btnDeletar') as HTMLButtonElement;
         this.btnJogarNovamente = document.getElementById('btnJogarNovamente') as HTMLButtonElement;
-
-        this.jogo = new Termo();
-
+        this.localStorageService = new LocalStorageService()
+        this.jogo = new Termo(this.localStorageService.carregarDados());
+        
 
         this.RegistrarEventos();
     }
@@ -44,7 +52,16 @@ class TelaTermo{
 
         this.btnJogarNovamente.addEventListener('click',() => this.Reiniciar());
 
-        this.btnChutar.addEventListener('click', () => this.Chutar())
+        this.btnChutar.addEventListener('click', () => this.Chutar());
+
+        this.btnExibirHistorico.addEventListener('click', () => {this.pnlHistorico.style.display = 'grid';});
+
+        document.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
+      
+            if (!this.pnlHistorico.contains(target) && event.target != this.btnExibirHistorico)
+              this.pnlHistorico.style.display = 'none';
+          });
     } 
    
 
@@ -74,8 +91,28 @@ class TelaTermo{
 
     Reiniciar()
     {
-        location.reload();
-    }
+        this.limparGrid();
+        this.limparTeclado();
+        
+        this.notificacao.replaceChildren();
+        this.btnChutar.disabled = false;
+
+        this.jogo = new Termo(this.localStorageService.carregarDados());
+  
+    }  
+    private limparGrid(): void {
+        for(let i = 0; i > this.pnlTermo.children.length; i++){
+            let painelAtual: HTMLDivElement = this.pnlTermo.children[i] as HTMLDivElement;
+            for (let index = 0; index < painelAtual.childNodes.length; index++) {
+                painelAtual.childNodes[index].textContent = '';       
+            };
+        }
+      }
+    
+      
+    private limparTeclado(): void {
+        this.ModificarTodosBotoes(false,"rgb(169, 169, 241)");
+      }
 
     Apagar(): void {
         let painelAtual:HTMLDivElement = this.EscolherPainelDoJogo();
@@ -145,6 +182,8 @@ class TelaTermo{
         this.notificacao.style.color = "green";
         this.notificacao.style.border= "2px solid green";
         this.notificacao.style.borderRadius = "10px";
+
+        this.atualizarHistorico();
       }
       if(resultado == false){
         if(this.jogo.ObterQuantidadeDeErros() == 5){
@@ -154,6 +193,8 @@ class TelaTermo{
             this.notificacao.style.color = "Red";
             this.notificacao.style.border= "2px solid red";
             this.notificacao.style.borderRadius = "10px";
+
+            this.atualizarHistorico();
         }
       }
     }
@@ -173,10 +214,10 @@ class TelaTermo{
         });
     }
 
-    DesbilitarTodosBotoes() {
+    ModificarTodosBotoes(desabilitar: boolean = true, cor:string = "rgb(54, 70, 99)") {
         this.buttons.forEach(btn => {
-            btn.style.backgroundColor = "rgb(54, 70, 99)";
-            btn.disabled = true;
+            btn.style.backgroundColor = cor;
+            btn.disabled = desabilitar;
         });
     }
 
@@ -195,5 +236,48 @@ class TelaTermo{
         cores = [];
     }
     
+    private popularEstatisticas(): void {
+        const lblJogos = document.getElementById('lblJogos') as HTMLParagraphElement;
+        const lblVitorias = document.getElementById('lblVitorias') as HTMLParagraphElement;
+        const lblDerrotas = document.getElementById('lblDerrotas') as HTMLParagraphElement;
+        const lblSequencia = document.getElementById('lblSequencia') as HTMLParagraphElement;
+    
+        lblJogos.textContent = this.jogo.historico.jogos.toString();
+        lblVitorias.textContent = this.jogo.historico.vitorias.toString();
+        lblDerrotas.textContent = this.jogo.historico.derrotas.toString();
+        lblSequencia.textContent = this.jogo.historico.sequencia.toString();
+    }
+    
+    private desenharGridTentativas(): void {
+        const elementos =
+          Array.from(document.querySelectorAll('.valor-tentativa')) as HTMLParagraphElement[];
+        
+        const tentativas = this.jogo.historico.tentativas;
+    
+        for (let i = 0; i < tentativas.length; i++) {
+          const label = elementos[i];
+          const qtdTentativas = tentativas[i];
+    
+          label.textContent = qtdTentativas.toString();
+    
+          let tamanho: number = 0;
+    
+          if (qtdTentativas > 0 && this.jogo.historico.vitorias > 0)
+            tamanho = qtdTentativas / this.jogo.historico.vitorias;
+          else
+            tamanho = 0.05;
+    
+          const novoTamanho = tamanho * 100;      
+          label.style.width = `${(novoTamanho).toString()}%`;
+        }
+    }
+
+    private atualizarHistorico(): void {
+        this.localStorageService.salvarDados(this.jogo.historico);
+        
+        this.popularEstatisticas();
+        this.desenharGridTentativas();
+    }
+        
 }
 window.addEventListener('load', () => new TelaTermo());
